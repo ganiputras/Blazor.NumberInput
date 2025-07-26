@@ -1,122 +1,108 @@
-![AIDispatcher Logo](https://raw.githubusercontent.com/ganiputras/AIDispatcher/master/logo.png)
+# 🔢 Blazor NumberInput Component
 
-# AIDispatcher
+Komponen Blazor kustom untuk input angka dengan dukungan validasi, format lokal, dan integrasi form yang fleksibel. Terdiri dari dua komponen utama:
 
-**Modern, modular, and extensible CQRS Dispatcher for .NET 8+**
+---
 
-[![NuGet](https://img.shields.io/nuget/v/AIDispatcher.svg?style=flat-square)](https://www.nuget.org/packages/AIDispatcher)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/ganiputras/AIDispatcher/blob/master/AIDispatcher/LICENSE.txt)
+## 📦 Komponen
 
+### 1. `<NumberInput>`
+Komponen ringan dan fleksibel untuk input angka mandiri, tanpa tergantung pada `EditForm`.
 
-## 🚀 AIDispatcher: CQRS & Notification Pipeline for .NET 8+
+#### ✅ Fitur Utama
+- Binding: `@bind-NumberValue`
+- Format angka (`N0`, `F2`, dsb)
+- Validasi manual via parameter `Required`
+- Prefix/Suffix (misal: Rp, %, kg)
+- Dukungan `MinValue`, `MaxValue`, `Step`
+- Dukungan parsing lokal (`CultureInfo`)
+- Navigasi keyboard ↑ ↓
+- Event interaktif: `@oninput`, `@onchange`, `@onpaste`
+- Atribut tambahan HTML (`AdditionalAttributes`)
 
-AIDispatcher adalah library .NET open-source untuk CQRS, Pipeline Behavior, dan Notification Dispatcher modern — terinspirasi MediatR, namun lebih modular, lebih fleksibel, dan lebih mudah dikembangkan.
-
-##  💡 Integrasi & Kompatibilitas
-AIDispatcher mengadopsi interface dan pola standar CQRS yang sudah umum di komunitas .NET (IRequest, INotification, dll), sehingga mudah diadopsi untuk proyek baru maupun migrasi dari solusi lain.
-Semua pipeline dan behavior bersifat modular, dapat diaktifkan atau dikustomisasi sesuai kebutuhan aplikasi.
-
-
-## ✨ Fitur Utama
-
-- Pipeline Behavior Modular: Logging, Retry, Timeout, Circuit Breaker, Exception Handling, Performance Monitoring, Pre/Post Processor
-- Notification Dispatcher: Parallel & Sequential, Prioritas Handler (`WithPriority`), pipeline untuk logging, timeout, retry, dsb
-- Request Dispatcher (CQRS): Handler dengan Response & Void, pipeline modular
-- Extensible & Plug & Play: Mudah menambah pipeline/behavior via DI
-- Dokumentasi XML lengkap (Bahasa Indonesia): semua public API terdokumentasi untuk IntelliSense
-
-## 📦 Instalasi
-
-Install via NuGet:
-
-```sh
-dotnet add package AIDispatcher
+#### 🧩 Contoh
+```razor
+<NumberInput @bind-NumberValue="amount"
+             Placeholder="Masukkan jumlah"
+             DisplayPrefix="Rp"
+             Format="N0"
+             Required="true"
+             RequiredValueValidationMessage="Wajib diisi" />
 ```
 
-## ⚡ Registrasi Dispatcher
-```sh
-// WAJIB - Registrasi inti AIDispatcher (handler, pipeline dasar, auto scan)
-builder.Services.AddAIDispatcherCore();
+---
 
-// OPSIONAL - Aktifkan pipeline lanjutan (retry, timeout, circuit breaker, dsb)
-builder.Services.AddAIDispatcherAdvanced();
+### 2. `<NumberInputBase>`
+Turunan dari `InputBase<decimal?>`, ideal untuk integrasi `EditForm` dan validasi otomatis dengan anotasi data (`[Required]`, `[Range]`, dsb).
 
-// OPSIONAL - Konfigurasi global
-// builder.Services.Configure<DispatcherOptions>(opt => { ... });
+#### ✅ Fitur Tambahan
+- Binding: `@bind-Value`
+- Terintegrasi otomatis dengan `EditForm`
+- Validasi otomatis dengan `DataAnnotations`
+- Mendukung `ValidationMessage`
+- Dukungan semua fitur `<NumberInput>` (format, batasan, kultur, dsb)
+- Mengikuti pipeline Blazor standar
+
+#### 🧩 Contoh
+```razor
+<EditForm Model="model" OnValidSubmit="Submit">
+    <DataAnnotationsValidator />
+    <NumberInputBase @bind-Value="model.Amount"
+                     Placeholder="Masukkan jumlah"
+                     DisplayPrefix="Rp"
+                     Format="N0" />
+    <ValidationMessage For="@(() => model.Amount)" />
+</EditForm>
 ```
 
-##  🏷️ Attribute Support
-```sh
-[WithPriority(int)]
-Tentukan prioritas handler notification (angka lebih kecil = prioritas lebih tinggi).
+---
 
-[WithTimeout(int ms)]
-Batasi waktu maksimal eksekusi handler/notification (overrides default timeout).
-```
+## 🔬 Perbandingan Singkat
 
+| Fitur / Aspek                 | `<NumberInput>`                    | `<NumberInputBase>` (InputBase)   |
+|------------------------------|------------------------------------|-----------------------------------|
+| Binding                      | `@bind-NumberValue`                | `@bind-Value`                     |
+| Validasi Otomatis            | ❌ Manual                          | ✅ Ya, via `EditForm`             |
+| Digunakan dalam `EditForm`   | Opsional                           | ✅ Direkomendasikan               |
+| Prefix / Suffix              | ✅                                  | ✅                                |
+| Keyboard ↑ ↓ Step            | ✅                                  | ✅                                |
+| Atribut HTML tambahan        | ✅                                  | ✅                                |
+| Reusabilitas (form standar)  | ⚠️ Perlu usaha                     | ✅ Sesuai konvensi Blazor         |
+| Berat & fleksibilitas        | Ringan & bebas                     | Standar & konsisten               |
 
- ## 🛠️ Contoh Penggunaan
-Request Handler (CQRS)
-```sh
-public class GetOrderQuery : IRequest<OrderDto>
-{
-    public int Id { get; set; }
-}
+---
 
-public class GetOrderHandler : IRequestHandler<GetOrderQuery, OrderDto>
-{
-    public Task<OrderDto> Handle(GetOrderQuery request, CancellationToken cancellationToken)
-    {
-        // Query ke database atau source data lain
-        return Task.FromResult(new OrderDto { ... });
-    }
-}
+## 📘 Dokumentasi Properti Umum
 
-// Kirim request
-var order = await dispatcher.Send<GetOrderQuery, OrderDto>(new GetOrderQuery { Id = 1 });    
-```
+| Parameter                    | Tipe                          | Deskripsi                                                 |
+|-----------------------------|-------------------------------|-----------------------------------------------------------|
+| `NumberValue` / `Value`     | `decimal?`                    | Nilai angka (nullable).                                   |
+| `Format`                    | `string`                      | Format angka, contoh: `"N0"`, `"F2"`                      |
+| `DecimalPlaces`             | `int`                         | Presisi parsing desimal                                   |
+| `Culture`                   | `CultureInfo`                 | Kultur lokal seperti `new("id-ID")`                       |
+| `MinValue`, `MaxValue`      | `decimal?`                    | Batas bawah & atas nilai                                  |
+| `Step`                      | `decimal?`                    | Besar kenaikan nilai saat `↑↓`                            |
+| `Placeholder`               | `string?`                     | Placeholder input                                         |
+| `DisplayPrefix` / Suffix    | `string?`                     | Teks tambahan sebelum/sesudah nilai                       |
+| `Required`                  | `bool?`                       | Menandakan wajib diisi (manual)                           |
+| `RequiredValueValidationMessage` | `string?`               | Pesan validasi jika `Required=true`                      |
+| `AdditionalAttributes`      | `Dictionary<string, object>?` | Atribut tambahan seperti `data-*`, `style`, dll.          |
 
+---
 
+## 🚀 Rekomendasi Penggunaan
 
+- Gunakan `<NumberInput>` jika:
+  - Butuh komponen input angka ringan
+  - Tidak menggunakan `EditForm`
+  - Ingin kontrol validasi manual
 
-## ⚡ Pipeline Built-in
+- Gunakan `<NumberInputBase>` jika:
+  - Menggunakan `EditForm`
+  - Ingin validasi otomatis dari model
+  - Mengikuti pola `InputBase<T>` Blazor
 
-- Logging: Catat request, notifikasi, dan durasi eksekusi
+---
 
-- Retry: Otomatis ulangi jika gagal (Polly)
-
-- Timeout: Batasi waktu maksimal eksekusi
-
-- Circuit Breaker: Putus eksekusi jika error berturut-turut
-
-- Performance: Warning jika eksekusi lambat
-
-- Pre/Post Processor: Hook sebelum/sesudah handler berjalan
-
-- Exception Handling: Tangani error secara global
-
-- Notification Priority: Eksekusi handler sesuai prioritas
-
-##  🆚 Fitur
-
-| Fitur                        | AIDispatcher |
-| ---------------------------- | ------------ |
-| Request/Response             | ✔️           |
-| Notification/Publish         | ✔️           |
-| Pipeline Modular             | ✔️           |
-| Logging/Performance Pipeline | ✔️           |
-| Retry/Circuit Breaker/Polly  | ✔️           |
-| Exception Handling Pipeline  | ✔️           |
-| Notification Priority        | ✔️           |
-| Notification Parallel/Seq    | ✔️           |
-| XML Doc Bahasa Indonesia     | ✔️           |
-| Extensible Pipeline          | ✔️           |
-| DI Friendly                  | ✔️           |
-| Blazor Friendly              | ✔️           |
-
-  
-
-
-##    📚 Lisensi
-MIT © 2025 Gani Putras
-Kontribusi & feedback sangat diterima!
+## 👨‍💻 Pengembang
+Dibuat oleh [ganiputras](https://github.com/ganiputras) · MIT License · Kompatibel Blazor Server & WASM
