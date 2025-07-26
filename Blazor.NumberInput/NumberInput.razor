@@ -1,0 +1,163 @@
+﻿@using System.Globalization
+
+<div class="input-group">
+    @if (!string.IsNullOrWhiteSpace(DisplayPrefix))
+    {
+        <span class="input-group-text">@DisplayPrefix</span>
+    }
+
+    <input class="form-control @TextAlign @Css"
+           type="text"
+           inputmode="numeric"
+           id="@Id"
+           name="@Name"
+           value="@_displayValue"
+           step="@StepDisplay"
+           min="@MinValue?.ToString(Culture)"
+           max="@MaxValue?.ToString(Culture)"
+           placeholder="@Placeholder"
+           autocomplete="@AutoComplete"
+           disabled="@Disabled"
+           required="@Required"
+           @oninput="OnInput"
+           @onchange="OnChange"
+           @onkeydown="OnKeyDown"
+           @onkeydown:preventDefault="@_preventKey"
+           @onpaste="OnPaste"
+           @attributes="AdditionalAttributes" />
+
+    @if (!string.IsNullOrWhiteSpace(DisplaySuffix))
+    {
+        <span class="input-group-text">@DisplaySuffix</span>
+    }
+</div>
+
+@if (string.IsNullOrWhiteSpace(_displayValue) && Required == true)
+{
+    <div class="validation-message">@RequiredValueValidationMessage</div>
+}
+
+@code {
+    [Parameter] public decimal? NumberValue { get; set; }
+    [Parameter] public EventCallback<decimal?> NumberValueChanged { get; set; }
+
+    [Parameter] public int DecimalPlaces { get; set; } = 0;
+    [Parameter] public string Format { get; set; } = "N0"; // Bisa "F2", "N0", dst.
+    [Parameter] public CultureInfo Culture { get; set; } = CultureInfo.CurrentCulture;
+
+    [Parameter] public decimal? MinValue { get; set; } = 0;
+    [Parameter] public decimal? MaxValue { get; set; }
+    [Parameter] public decimal? Step { get; set; }
+
+    [Parameter] public string? Id { get; set; } = Guid.NewGuid().ToString();
+    [Parameter] public string? Name { get; set; } = Guid.NewGuid().ToString();
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public string? AutoComplete { get; set; } = "off";
+    [Parameter] public string? Css { get; set; }
+    [Parameter] public string? TextAlign { get; set; } = "text-start";
+    [Parameter] public bool? Disabled { get; set; }
+    [Parameter] public bool? Required { get; set; }
+    [Parameter] public string? RequiredValueValidationMessage { get; set; } = "Value is required.";
+
+    [Parameter] public string? DisplayPrefix { get; set; }
+    [Parameter] public string? DisplaySuffix { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string? _displayValue;
+    private bool _preventKey;
+    private bool _paste;
+    private string StepDisplay => Step?.ToString(Culture) ?? "any";
+
+    private CancellationTokenSource? _debounceCts;
+
+    protected override void OnParametersSet()
+    {
+        _displayValue = NumberValue?.ToString(Format, Culture);
+    }
+
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        _displayValue = e.Value?.ToString();
+
+        _debounceCts?.Cancel();
+        _debounceCts = new CancellationTokenSource();
+
+        try
+        {
+            await Task.Delay(300, _debounceCts.Token); // Debounce 300ms
+            if (_paste || string.IsNullOrWhiteSpace(_displayValue))
+            {
+                await ApplyParsedValue(_displayValue);
+                _paste = false;
+            }
+        }
+        catch (TaskCanceledException) { }
+    }
+
+    private async Task OnChange(ChangeEventArgs e)
+    {
+        await ApplyParsedValue(e.Value?.ToString());
+    }
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        _preventKey = false;
+
+        if (e.Key is "Tab" or "Backspace" or "Delete" or "Enter" or "ArrowLeft" or "ArrowRight")
+            return;
+
+        if (e.Key is "ArrowUp")
+        {
+            NumberValue = (NumberValue ?? 0) + (Step ?? 1);
+            _displayValue = NumberValue?.ToString(Format, Culture);
+            _ = NumberValueChanged.InvokeAsync(NumberValue);
+            _preventKey = true;
+        }
+        else if (e.Key is "ArrowDown")
+        {
+            NumberValue = (NumberValue ?? 0) - (Step ?? 1);
+            _displayValue = NumberValue?.ToString(Format, Culture);
+            _ = NumberValueChanged.InvokeAsync(NumberValue);
+            _preventKey = true;
+        }
+        else if (!IsValidInputKey(e.Key))
+        {
+            _preventKey = true;
+        }
+    }
+
+    private void OnPaste(ClipboardEventArgs _) => _paste = true;
+
+    private async Task ApplyParsedValue(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            NumberValue = null;
+        }
+        else
+        {
+            string clean = raw.Replace(Culture.NumberFormat.NumberGroupSeparator, "");
+            if (decimal.TryParse(clean, NumberStyles.Number, Culture, out var parsed))
+            {
+                parsed = Math.Round(parsed, DecimalPlaces);
+                if (MinValue is not null && parsed < MinValue) parsed = MinValue.Value;
+                if (MaxValue is not null && parsed > MaxValue) parsed = MaxValue.Value;
+
+                NumberValue = parsed;
+            }
+        }
+
+        _displayValue = NumberValue?.ToString(Format, Culture);
+        await NumberValueChanged.InvokeAsync(NumberValue);
+    }
+
+    private bool IsValidInputKey(string key)
+    {
+        if (key.Length == 1 && char.IsDigit(key[0])) return true;
+
+        string decimalSep = Culture.NumberFormat.NumberDecimalSeparator;
+        return key == decimalSep;
+    }
+}

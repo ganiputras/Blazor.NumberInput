@@ -1,0 +1,16 @@
+﻿8. Tanpa Binding — Menggunakan NumberValueChanged
+
+<NumberInput NumberValue="@Value"
+             NumberValueChanged="@OnValueChanged"
+             Format="F0" />
+
+@code {
+    decimal? Value { get; set; }
+
+    Task OnValueChanged(decimal? value)
+    {
+        Value = value;
+        Console.WriteLine($"Nilai diubah: {value}");
+        return Task.CompletedTask;
+    }
+}

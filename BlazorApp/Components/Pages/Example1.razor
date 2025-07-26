@@ -1,0 +1,24 @@
+﻿1. Basic Usage:
+
+<NumberInput @bind-NumberValue="@Amount" />
+
+@code {
+    decimal? Amount { get; set; }
+}
+
+
+<div class="position-relative mb-4">
+    <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2" onclick="copyCode(this)">
+        📋 Copy
+    </button>
+
+    <pre class="bg-light p-3 rounded mb-0">
+<code>
+&lt;NumberInput &commat;bind-NumberValue=&quot;&commat;Amount&quot; /&gt;
+
+&commat;code {
+    decimal? Amount { get; set; }
+}
+</code>
+    </pre>
+</div>

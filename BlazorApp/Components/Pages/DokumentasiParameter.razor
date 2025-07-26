@@ -1,0 +1,138 @@
+﻿
+<h2 class="mb-4 text-primary">📘 Dokumentasi Parameter <code>&lt;NumberInput&gt;</code></h2>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>🔧 Nama Parameter</th>
+                <th>🧩 Tipe</th>
+                <th>📌 Contoh Nilai</th>
+                <th class="desc-col">📝 Deskripsi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>NumberValue</code></td>
+                <td><code>decimal?</code></td>
+                <td>1234.56</td>
+                <td class="desc-col">Nilai angka yang ditampilkan dan dikontrol oleh komponen. Dapat digunakan dengan <code>&commat;bind-NumberValue</code>.</td>
+            </tr>
+            <tr>
+                <td><code>NumberValueChanged</code></td>
+                <td><code>EventCallback&lt;decimal?&gt;</code></td>
+                <td>-</td>
+                <td class="desc-col">Event callback yang dipicu saat <code>NumberValue</code> berubah. Digunakan saat binding manual.</td>
+            </tr>
+            <tr>
+                <td><code>Format</code></td>
+                <td><code>string</code></td>
+                <td>"N0", "F2"</td>
+                <td class="desc-col">Format tampilan angka sesuai format string .NET, seperti <code>N0</code> (tanpa desimal) atau <code>F2</code> (dua desimal).</td>
+            </tr>
+            <tr>
+                <td><code>DecimalPlaces</code></td>
+                <td><code>int</code></td>
+                <td>2</td>
+                <td class="desc-col">Jumlah digit desimal yang dipertahankan saat parsing input pengguna.</td>
+            </tr>
+            <tr>
+                <td><code>Culture</code></td>
+                <td><code>CultureInfo</code></td>
+                <td>new("id-ID")</td>
+                <td class="desc-col">Menentukan format angka lokal (seperti koma atau titik desimal).</td>
+            </tr>
+            <tr>
+                <td><code>MinValue</code></td>
+                <td><code>decimal?</code></td>
+                <td>0</td>
+                <td class="desc-col">Nilai minimum yang diperbolehkan. Nilai input akan disesuaikan jika lebih kecil dari ini.</td>
+            </tr>
+            <tr>
+                <td><code>MaxValue</code></td>
+                <td><code>decimal?</code></td>
+                <td>1000</td>
+                <td class="desc-col">Nilai maksimum yang diperbolehkan. Nilai input akan disesuaikan jika lebih besar dari ini.</td>
+            </tr>
+            <tr>
+                <td><code>Step</code></td>
+                <td><code>decimal?</code></td>
+                <td>1</td>
+                <td class="desc-col">Langkah penambahan atau pengurangan saat pengguna menekan tombol panah atas atau bawah.</td>
+            </tr>
+            <tr>
+                <td><code>Id</code></td>
+                <td><code>string?</code></td>
+                <td>"input-id"</td>
+                <td class="desc-col">Atribut <code>id</code> HTML. Jika tidak diatur, akan otomatis dibuat GUID.</td>
+            </tr>
+            <tr>
+                <td><code>Name</code></td>
+                <td><code>string?</code></td>
+                <td>"quantity"</td>
+                <td class="desc-col">Nama input untuk dikirimkan melalui form HTML.</td>
+            </tr>
+            <tr>
+                <td><code>Placeholder</code></td>
+                <td><code>string?</code></td>
+                <td>"Masukkan nilai"</td>
+                <td class="desc-col">Teks yang muncul saat input kosong.</td>
+            </tr>
+            <tr>
+                <td><code>AutoComplete</code></td>
+                <td><code>string?</code></td>
+                <td>"off"</td>
+                <td class="desc-col">Kontrol apakah browser akan menyimpan/menyisipkan nilai sebelumnya secara otomatis.</td>
+            </tr>
+            <tr>
+                <td><code>Css</code></td>
+                <td><code>string?</code></td>
+                <td>"form-control-sm"</td>
+                <td class="desc-col">Kelas CSS tambahan untuk memperkecil atau memperluas tampilan input.</td>
+            </tr>
+            <tr>
+                <td><code>TextAlign</code></td>
+                <td><code>string?</code></td>
+                <td>"text-end"</td>
+                <td class="desc-col">Kelas perataan teks: <code>text-start</code>, <code>text-center</code>, atau <code>text-end</code>.</td>
+            </tr>
+            <tr>
+                <td><code>Disabled</code></td>
+                <td><code>bool?</code></td>
+                <td>true</td>
+                <td class="desc-col">Jika diaktifkan, input tidak dapat diubah oleh pengguna.</td>
+            </tr>
+            <tr>
+                <td><code>Required</code></td>
+                <td><code>bool?</code></td>
+                <td>true</td>
+                <td class="desc-col">Menandakan bahwa input wajib diisi. Digunakan untuk validasi dasar.</td>
+            </tr>
+            <tr>
+                <td><code>RequiredValueValidationMessage</code></td>
+                <td><code>string?</code></td>
+                <td>"Wajib diisi"</td>
+                <td class="desc-col">Pesan kesalahan yang ditampilkan jika input kosong dan <code>Required = true</code>.</td>
+            </tr>
+            <tr>
+                <td><code>DisplayPrefix</code></td>
+                <td><code>string?</code></td>
+                <td>"Rp"</td>
+                <td class="desc-col">Teks di sisi kiri input, seperti simbol mata uang.</td>
+            </tr>
+            <tr>
+                <td><code>DisplaySuffix</code></td>
+                <td><code>string?</code></td>
+                <td>"kg"</td>
+                <td class="desc-col">Teks di sisi kanan input, seperti satuan atau persentase.</td>
+            </tr>
+            <tr>
+                <td><code>AdditionalAttributes</code></td>
+                <td><code>Dictionary&lt;string, object&gt;?</code></td>
+                <td>-</td>
+                <td class="desc-col">Untuk atribut HTML tambahan seperti <code>data-*</code>, <code>style</code>, atau <code>aria-* </code>.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+

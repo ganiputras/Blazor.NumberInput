@@ -1,0 +1,9 @@
+﻿2. Dengan Format & 2 Desimal
+
+<NumberInput @bind-NumberValue="@Price"
+             Format="F2"
+             DecimalPlaces="2"
+             Placeholder="0.00" />
+@code {
+    decimal? Price { get; set; } = 1234.5678M;
+}

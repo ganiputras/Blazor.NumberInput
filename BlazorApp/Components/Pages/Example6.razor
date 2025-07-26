@@ -1,0 +1,9 @@
+﻿6. Readonly View dengan Text Alignment
+<NumberInput NumberValue="@ReadonlyValue"
+             Disabled="true"
+             TextAlign="text-end"
+             Format="N2"
+             DisplaySuffix="kg" />
+@code {
+    decimal? ReadonlyValue { get; set; } = 78.5M;
+}

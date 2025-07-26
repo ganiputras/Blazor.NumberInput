@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="BlazorApp.styles.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <script>
+        function copyCode(button) {
+            const pre = button.nextElementSibling;
+            const code = pre.innerText;
+
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = "✅ Copied!";
+                setTimeout(() => button.innerHTML = originalText, 1500);
+            });
+        }
+    </script>
+    <style>
+        pre code {
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: Consolas, monospace;
+        }
+
+        pre {
+            font-size: 0.9rem;
+        }
+
+        .btn-copy {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+        }
+    </style>
+    <HeadOutlet />
+</head>
+
+<body>
+<Routes />
+
+    <script src="_framework/blazor.web.js"></script>
+</body>
+
+</html>

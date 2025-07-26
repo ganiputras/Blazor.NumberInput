@@ -1,0 +1,68 @@
+﻿
+
+<h2 class="mb-4 text-primary">✨ Fitur-Fitur Komponen <code>&lt;NumberInput&gt;</code></h2>
+
+<div>
+    <div class="feature-title">🔢 1. Binding Nilai Angka</div>
+    <ul class="feature-list">
+        <li>Mendukung binding dua arah menggunakan <code>&commat;bind-NumberValue</code>.</li>
+        <li>Nilai mendukung <code>null</code> untuk input kosong.</li>
+        <li>Event <code>NumberValueChanged</code> tersedia untuk binding manual.</li>
+    </ul>
+
+    <div class="feature-title">🌍 2. Format dan Kultur Lokal</div>
+    <ul class="feature-list">
+        <li>Format angka sesuai string format .NET seperti <code>"N0"</code>, <code>"F2"</code>.</li>
+        <li>Pengaturan <code>CultureInfo</code> untuk dukungan <code>id-ID</code>, <code>en-US</code>, dll.</li>
+        <li>Parsing dan tampilan angka mengikuti separator lokal (koma/titik).</li>
+    </ul>
+
+    <div class="feature-title">📏 3. Batasan Angka & Step</div>
+    <ul class="feature-list">
+        <li>Dukungan <code>MinValue</code>, <code>MaxValue</code>, dan <code>Step</code>.</li>
+        <li>Keyboard navigation: <kbd>ArrowUp</kbd> dan <kbd>ArrowDown</kbd> untuk menaikkan/menurunkan nilai.</li>
+        <li>Nilai akan otomatis disesuaikan ke dalam rentang jika melampaui batas.</li>
+    </ul>
+
+    <div class="feature-title">🎯 4. Presisi dan Pembulatan</div>
+    <ul class="feature-list">
+        <li>Properti <code>DecimalPlaces</code> mengatur jumlah digit desimal hasil parsing.</li>
+        <li>Angka akan dibulatkan otomatis menggunakan <code>Math.Round</code>.</li>
+    </ul>
+
+    <div class="feature-title">🧠 5. Validasi Input</div>
+    <ul class="feature-list">
+        <li>Validasi karakter saat input: hanya angka dan separator desimal yang diizinkan.</li>
+        <li>Dukungan atribut <code>required</code> dan pesan validasi melalui <code>RequiredValueValidationMessage</code>.</li>
+    </ul>
+
+    <div class="feature-title">🕹️ 6. Event Interaktif</div>
+    <ul class="feature-list">
+        <li><code>&commat;oninput</code> dengan debounce 300ms untuk efisiensi parsing.</li>
+        <li><code>&commat;onchange</code> memicu validasi saat blur atau tekan enter.</li>
+        <li><code>&commat;onpaste</code> mendukung input dari clipboard dengan aman.</li>
+    </ul>
+
+    <div class="feature-title">💡 7. Tampilan dan UX</div>
+    <ul class="feature-list">
+        <li>Dukungan <code>Placeholder</code>, <code>AutoComplete</code>, dan <code>Disabled</code>.</li>
+        <li>Kustomisasi tampilan melalui <code>TextAlign</code> dan <code>Css</code>.</li>
+    </ul>
+
+    <div class="feature-title">💬 8. Prefix dan Suffix</div>
+    <ul class="feature-list">
+        <li>Tampilan teks tambahan di kiri (<code>DisplayPrefix</code>) dan kanan (<code>DisplaySuffix</code>) input.</li>
+        <li>Sangat berguna untuk simbol mata uang, satuan berat, persen, dll.</li>
+    </ul>
+
+    <div class="feature-title">🔧 9. Atribut HTML Tambahan</div>
+    <ul class="feature-list">
+        <li>Mendukung <code>AdditionalAttributes</code> untuk atribut kustom seperti <code>data-* </code>, <code>style</code>, <code>aria-* </code>.</li>
+    </ul>
+
+    <div class="feature-title">🛠️ 10. Siap Integrasi</div>
+    <ul class="feature-list">
+        <li>Kompatibel untuk Blazor Server dan WebAssembly.</li>
+        <li>Langsung dapat digunakan dalam form dan layout berbasis Bootstrap.</li>
+    </ul>
+</div>

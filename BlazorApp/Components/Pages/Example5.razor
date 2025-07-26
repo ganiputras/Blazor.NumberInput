@@ -1,0 +1,8 @@
+﻿5. Dibuat Wajib (Required) + Validasi
+
+<NumberInput @bind-NumberValue="@Weight"
+             Required="true"
+             RequiredValueValidationMessage="Wajib diisi beratnya!" />
+@code {
+    decimal? Weight { get; set; }
+}

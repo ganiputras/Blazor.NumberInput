@@ -1,0 +1,8 @@
+﻿10. Dukungan Paste dengan Validasi
+<NumberInput @bind-NumberValue="@Score"
+             Placeholder="Paste nilai dari Excel"
+             DecimalPlaces="1"
+             Format="N1" />
+@code {
+    decimal? Score { get; set; }
+}

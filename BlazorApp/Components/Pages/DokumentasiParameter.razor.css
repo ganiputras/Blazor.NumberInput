@@ -1,0 +1,15 @@
+﻿.desc-col,
+td.desc-col {
+    white-space: normal !important;
+    word-break: break-word;
+    max-width: 450px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+code {
+    color: #c7254e;
+    background-color: #f9f2f4;
+    padding: 2px 4px;
+    border-radius: 4px;
+}

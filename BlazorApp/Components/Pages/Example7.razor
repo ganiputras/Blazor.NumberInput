@@ -1,0 +1,11 @@
+﻿7. Custom ID, Name, Autocomplete dan CSS
+
+<NumberInput Id="unit-price"
+             Name="unitPrice"
+             AutoComplete="on"
+             Css="my-custom-style"
+             Placeholder="Masukkan harga satuan"
+             @bind-NumberValue="@UnitPrice" />
+@code {
+    decimal? UnitPrice { get; set; }
+}

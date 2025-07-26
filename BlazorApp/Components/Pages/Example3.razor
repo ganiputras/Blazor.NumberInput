@@ -1,0 +1,9 @@
+﻿@using System.Globalization
+3. Culture: Indonesia (id-ID)
+<NumberInput @bind-NumberValue="@Total"
+             Culture="@(new CultureInfo("id-ID"))"
+                 Format="N0"
+                 DisplayPrefix="Rp" />
+@code {
+    decimal? Total { get; set; } = 1500000;
+}

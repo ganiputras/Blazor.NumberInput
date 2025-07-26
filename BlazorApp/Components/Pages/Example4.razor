@@ -1,0 +1,8 @@
+﻿4. Dengan Step, Min, Max dan Panah Naik/Turun
+<NumberInput @bind-NumberValue="@Quantity"
+             Step="5"
+             MinValue="0"
+             MaxValue="100" />
+@code {
+    decimal? Quantity { get; set; } = 10;
+}
