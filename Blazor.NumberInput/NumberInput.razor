@@ -1,4 +1,5 @@
 ﻿@using System.Globalization
+@implements IDisposable
 
 <div class="input-group">
     @if (!string.IsNullOrWhiteSpace(DisplayPrefix))
@@ -21,6 +22,7 @@
            required="@Required"
            @oninput="OnInput"
            @onchange="OnChange"
+           @onblur="OnBlur"
            @onkeydown="OnKeyDown"
            @onkeydown:preventDefault="@_preventKey"
            @onpaste="OnPaste"
@@ -32,23 +34,41 @@
     }
 </div>
 
-@if (string.IsNullOrWhiteSpace(_displayValue) && Required == true)
+@if (_showRequiredError)
 {
-    <div class="validation-message">@RequiredValueValidationMessage</div>
+    <!-- Menampilkan pesan validasi jika Required diaktifkan dan input kosong -->
+    <div class="text-danger small mt-1">@RequiredValueValidationMessage</div>
 }
 
 @code {
+    // Nilai yang akan di-bind ke luar
     [Parameter] public decimal? NumberValue { get; set; }
+
+    // Digunakan saat binding dua arah (dengan @bind-NumberValue)
     [Parameter] public EventCallback<decimal?> NumberValueChanged { get; set; }
 
+    // Jumlah digit desimal (misal: 2 → "1.23")
     [Parameter] public int DecimalPlaces { get; set; } = 0;
-    [Parameter] public string Format { get; set; } = "N0"; // Bisa "F2", "N0", dst.
+
+    // Format tampilan angka (misal: "N0", "F2")
+    [Parameter] public string Format { get; set; } = "N0";
+
+    // Format lokal (misal: id-ID atau en-US)
     [Parameter] public CultureInfo Culture { get; set; } = CultureInfo.CurrentCulture;
 
-    [Parameter] public decimal? MinValue { get; set; } = 0;
+    // Jika true, maka input akan diformat ulang saat blur
+    [Parameter] public bool AutoFormatOnBlur { get; set; } = true;
+
+    // Batas bawah nilai
+    [Parameter] public decimal? MinValue { get; set; }
+
+    // Batas atas nilai
     [Parameter] public decimal? MaxValue { get; set; }
+
+    // Langkah perubahan nilai saat ↑/↓ ditekan
     [Parameter] public decimal? Step { get; set; }
 
+    // Atribut HTML dasar
     [Parameter] public string? Id { get; set; } = Guid.NewGuid().ToString();
     [Parameter] public string? Name { get; set; } = Guid.NewGuid().ToString();
     [Parameter] public string? Placeholder { get; set; }
@@ -56,24 +76,34 @@
     [Parameter] public string? Css { get; set; }
     [Parameter] public string? TextAlign { get; set; } = "text-start";
     [Parameter] public bool? Disabled { get; set; }
+
+    // Menandai apakah input wajib diisi
     [Parameter] public bool? Required { get; set; }
+
+    // Pesan validasi jika Required aktif dan kosong
     [Parameter] public string? RequiredValueValidationMessage { get; set; } = "Value is required.";
 
+    // Tambahan tampilan simbol atau label
     [Parameter] public string? DisplayPrefix { get; set; }
     [Parameter] public string? DisplaySuffix { get; set; }
 
+    // Untuk atribut tambahan (style, data-*, aria-*, dsb)
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
+    // Internal state
     private string? _displayValue;
     private bool _preventKey;
     private bool _paste;
+    private CancellationTokenSource? _debounceCts;
     private string StepDisplay => Step?.ToString(Culture) ?? "any";
 
-    private CancellationTokenSource? _debounceCts;
+    // Validasi manual: true jika Required dan input kosong
+    private bool _showRequiredError => Required == true && string.IsNullOrWhiteSpace(_displayValue);
 
     protected override void OnParametersSet()
     {
+        // Inisialisasi nilai tampilan dari NumberValue
         _displayValue = NumberValue?.ToString(Format, Culture);
     }
 
@@ -81,6 +111,7 @@
     {
         _displayValue = e.Value?.ToString();
 
+        // Debounce logic
         _debounceCts?.Cancel();
         _debounceCts = new CancellationTokenSource();
 
@@ -101,13 +132,25 @@
         await ApplyParsedValue(e.Value?.ToString());
     }
 
+    private async Task OnBlur(FocusEventArgs e)
+    {
+        // Format ulang angka saat kehilangan fokus (jika diaktifkan)
+        if (AutoFormatOnBlur)
+        {
+            _displayValue = NumberValue?.ToString(Format, Culture);
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
     private void OnKeyDown(KeyboardEventArgs e)
     {
         _preventKey = false;
 
+        // Tombol navigasi tidak dicegah
         if (e.Key is "Tab" or "Backspace" or "Delete" or "Enter" or "ArrowLeft" or "ArrowRight")
             return;
 
+        // Tombol ↑ menaikkan nilai
         if (e.Key is "ArrowUp")
         {
             NumberValue = (NumberValue ?? 0) + (Step ?? 1);
@@ -115,6 +158,7 @@
             _ = NumberValueChanged.InvokeAsync(NumberValue);
             _preventKey = true;
         }
+        // Tombol ↓ menurunkan nilai
         else if (e.Key is "ArrowDown")
         {
             NumberValue = (NumberValue ?? 0) - (Step ?? 1);
@@ -122,6 +166,7 @@
             _ = NumberValueChanged.InvokeAsync(NumberValue);
             _preventKey = true;
         }
+        // Mencegah karakter selain angka dan pemisah desimal
         else if (!IsValidInputKey(e.Key))
         {
             _preventKey = true;
@@ -138,10 +183,11 @@
         }
         else
         {
-            string clean = raw.Replace(Culture.NumberFormat.NumberGroupSeparator, "");
+            var clean = raw.Replace(Culture.NumberFormat.NumberGroupSeparator, "");
             if (decimal.TryParse(clean, NumberStyles.Number, Culture, out var parsed))
             {
                 parsed = Math.Round(parsed, DecimalPlaces);
+
                 if (MinValue is not null && parsed < MinValue) parsed = MinValue.Value;
                 if (MaxValue is not null && parsed > MaxValue) parsed = MaxValue.Value;
 
@@ -151,13 +197,19 @@
 
         _displayValue = NumberValue?.ToString(Format, Culture);
         await NumberValueChanged.InvokeAsync(NumberValue);
+        await InvokeAsync(StateHasChanged);
     }
 
+    // Validasi tombol input (digit & desimal)
     private bool IsValidInputKey(string key)
     {
         if (key.Length == 1 && char.IsDigit(key[0])) return true;
-
-        string decimalSep = Culture.NumberFormat.NumberDecimalSeparator;
+        var decimalSep = Culture.NumberFormat.NumberDecimalSeparator;
         return key == decimalSep;
+    }
+
+    public void Dispose()
+    {
+        _debounceCts?.Dispose();
     }
 }

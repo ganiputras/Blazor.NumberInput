@@ -1,5 +1,5 @@
-﻿@inherits Microsoft.AspNetCore.Components.Forms.InputBase<decimal?>
-@using System.Globalization
+﻿@using System.Globalization
+@inherits Microsoft.AspNetCore.Components.Forms.InputBase<decimal?>
 
 <div class="input-group">
     @if (!string.IsNullOrWhiteSpace(DisplayPrefix))
@@ -7,19 +7,21 @@
         <span class="input-group-text">@DisplayPrefix</span>
     }
 
-    <input class="form-control @Css @TextAlign @(EditContext?.GetValidationMessages(FieldIdentifier).Any() == true ? "is-invalid" : "")"
-           @bind="CurrentValueAsString"
+    <input class="form-control @TextAlign @Css @CssClass"
+           type="text"
+           inputmode="decimal"
            id="@Id"
            name="@Name"
+           value="@CurrentValueAsString"
            step="@StepDisplay"
-           min="@MinValue?.ToString(Culture)"
-           max="@MaxValue?.ToString(Culture)"
            placeholder="@Placeholder"
            autocomplete="@AutoComplete"
            disabled="@Disabled"
            required="@Required"
+           @oninput="OnInput"
+           @onblur="OnBlur"
            @onkeydown="OnKeyDown"
-           @onkeydown:preventDefault="_preventKey"
+           @onkeydown:preventDefault="@_preventKey"
            @onpaste="OnPaste"
            @attributes="AdditionalAttributes" />
 
@@ -29,80 +31,89 @@
     }
 </div>
 
-@if (EditContext?.GetValidationMessages(FieldIdentifier).Any() == true)
-{
-    <div class="validation-message">@EditContext.GetValidationMessages(FieldIdentifier).First()</div>
-}
-
 @code {
+    // Format dan budaya lokal
     [Parameter] public int DecimalPlaces { get; set; } = 0;
     [Parameter] public string Format { get; set; } = "N0";
     [Parameter] public CultureInfo Culture { get; set; } = CultureInfo.CurrentCulture;
 
-    [Parameter] public decimal? MinValue { get; set; } = 0;
+    // Format ulang saat blur
+    [Parameter] public bool AutoFormatOnBlur { get; set; } = true;
+
+    // Range batas nilai
+    [Parameter] public decimal? MinValue { get; set; }
     [Parameter] public decimal? MaxValue { get; set; }
     [Parameter] public decimal? Step { get; set; }
 
+    // Atribut umum input
     [Parameter] public string? Id { get; set; } = Guid.NewGuid().ToString();
     [Parameter] public string? Name { get; set; } = Guid.NewGuid().ToString();
     [Parameter] public string? Placeholder { get; set; }
     [Parameter] public string? AutoComplete { get; set; } = "off";
     [Parameter] public string? Css { get; set; }
+    [Parameter] public string? CssClass { get; set; }
     [Parameter] public string? TextAlign { get; set; } = "text-start";
     [Parameter] public bool? Disabled { get; set; }
     [Parameter] public bool? Required { get; set; }
-    [Parameter] public string? RequiredValueValidationMessage { get; set; } = "Value is required.";
 
+    // Tampilan prefix/suffix
     [Parameter] public string? DisplayPrefix { get; set; }
     [Parameter] public string? DisplaySuffix { get; set; }
 
-    [Parameter(CaptureUnmatchedValues = true)]
-    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private bool _preventKey;
     private bool _paste;
     private string StepDisplay => Step?.ToString(Culture) ?? "any";
 
-    /// <summary>
-    /// Mengonversi nilai decimal? ke string dengan format dan culture.
-    /// </summary>
+    /// <summary>Mengubah nilai ke string sesuai format dan budaya</summary>
     protected override string? FormatValueAsString(decimal? value)
     {
         return value?.ToString(Format, Culture);
     }
 
-    /// <summary>
-    /// Parsing nilai input string ke decimal? + validasi Min/Max + rounding.
-    /// </summary>
+    /// <summary>Parsing input pengguna menjadi decimal?</summary>
     protected override bool TryParseValueFromString(string? value, out decimal? result, out string? validationErrorMessage)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            result = null;
-            validationErrorMessage = null;
-            return true;
-        }
-
-        value = value.Replace(Culture.NumberFormat.NumberGroupSeparator, "");
-
-        if (decimal.TryParse(value, NumberStyles.Number, Culture, out var parsed))
-        {
-            parsed = Math.Round(parsed, DecimalPlaces);
-
-            if (MinValue is not null && parsed < MinValue.Value)
-                parsed = MinValue.Value;
-
-            if (MaxValue is not null && parsed > MaxValue.Value)
-                parsed = MaxValue.Value;
-
-            result = parsed;
-            validationErrorMessage = null;
-            return true;
-        }
-
         result = null;
-        validationErrorMessage = $"Invalid number format. Example: 1{Culture.NumberFormat.NumberDecimalSeparator}23";
+        validationErrorMessage = null;
+
+        if (string.IsNullOrWhiteSpace(value))
+            return true;
+
+        try
+        {
+            var cleaned = value.Replace(Culture.NumberFormat.NumberGroupSeparator, "");
+            if (decimal.TryParse(cleaned, NumberStyles.Number, Culture, out var parsed))
+            {
+                parsed = Math.Round(parsed, DecimalPlaces);
+
+                if (MinValue is not null && parsed < MinValue) parsed = MinValue.Value;
+                if (MaxValue is not null && parsed > MaxValue) parsed = MaxValue.Value;
+
+                result = parsed;
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            validationErrorMessage = $"Invalid input: {ex.Message}";
+        }
+
+        validationErrorMessage = "Input is not a valid number.";
         return false;
+    }
+
+    private void OnInput(ChangeEventArgs e)
+    {
+        CurrentValueAsString = e.Value?.ToString();
+    }
+
+    private void OnBlur(FocusEventArgs _)
+    {
+        if (AutoFormatOnBlur)
+        {
+            CurrentValueAsString = FormatValueAsString(CurrentValue);
+        }
     }
 
     private void OnKeyDown(KeyboardEventArgs e)
@@ -112,12 +123,12 @@
         if (e.Key is "Tab" or "Backspace" or "Delete" or "Enter" or "ArrowLeft" or "ArrowRight")
             return;
 
-        if (e.Key == "ArrowUp")
+        if (e.Key is "ArrowUp")
         {
             CurrentValue = (CurrentValue ?? 0) + (Step ?? 1);
             _preventKey = true;
         }
-        else if (e.Key == "ArrowDown")
+        else if (e.Key is "ArrowDown")
         {
             CurrentValue = (CurrentValue ?? 0) - (Step ?? 1);
             _preventKey = true;
@@ -133,6 +144,7 @@
     private bool IsValidInputKey(string key)
     {
         if (key.Length == 1 && char.IsDigit(key[0])) return true;
-        return key == Culture.NumberFormat.NumberDecimalSeparator;
+        string decimalSep = Culture.NumberFormat.NumberDecimalSeparator;
+        return key == decimalSep;
     }
 }

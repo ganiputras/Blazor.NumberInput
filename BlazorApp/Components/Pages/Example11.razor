@@ -1,0 +1,100 @@
+﻿@using System.ComponentModel.DataAnnotations
+
+<h3 class="text-primary mt-5">🚀 Contoh Penggunaan: <code>&lt;NumberInput&gt;</code> vs <code>&lt;NumberInputBase&gt;</code></h3>
+
+<div class="row gy-4">
+    <!-- Bagian kiri: NumberInput tanpa EditForm -->
+    <div class="col-md-6">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title text-secondary">🧱 <code>&lt;NumberInput&gt;</code> (Manual)</h5>
+                <p class="text-muted mb-2">
+                    Komponen ringan tanpa <code>EditForm</code>, validasi dilakukan manual melalui parameter.
+                </p>
+
+                <NumberInput @bind-NumberValue="amountManual"
+                             Placeholder="Masukkan jumlah"
+                             DisplayPrefix="Rp"
+                             Format="N0"
+                             Required="true"
+                             RequiredValueValidationMessage="Harus diisi!" />
+
+                <div class="mt-2 small text-muted">
+                    Nilai: <strong>@(amountManual?.ToString("N0") ?? "-")</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bagian kanan: NumberInputBase dalam EditForm -->
+    <div class="col-md-6">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title text-secondary">🧠 <code>&lt;NumberInputBase&gt;</code> (Form Friendly)</h5>
+                <p class="text-muted mb-2">
+                    Terintegrasi langsung dengan <code>EditForm</code> dan mendukung validasi otomatis dari atribut data anotasi.
+                </p>
+
+                <EditForm Model="model" OnValidSubmit="HandleValidSubmit">
+                    <DataAnnotationsValidator />
+
+                    <NumberInputBase @bind-Value="model.Amount"
+                                     Placeholder="Masukkan jumlah"
+                                     DisplayPrefix="Rp"
+                                     Format="N0"
+                                     MinValue="1000"
+                                     MaxValue="1000000" />
+
+                    <ValidationMessage For="@(() => model.Amount)" />
+
+                    <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                </EditForm>
+
+                <div class="mt-2 small text-muted">
+                    Nilai: <strong>@(model.Amount?.ToString("N0") ?? "-")</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Card Perbandingan & Rekomendasi -->
+<div class="card mt-5 shadow-sm border-0">
+    <div class="card-body">
+        <h5 class="card-title text-primary">📌 Perbandingan Penggunaan</h5>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <strong>🧱 <code>&lt;NumberInput&gt;</code></strong>: Komponen mandiri yang tidak tergantung pada <code>EditForm</code>. Validasi dilakukan secara manual via parameter <code>Required</code>, cocok untuk penggunaan umum di luar form.
+            </li>
+            <li class="list-group-item">
+                <strong>🧠 <code>&lt;NumberInputBase&gt;</code></strong>: Mengikuti standar Blazor <code>InputBase&lt;T&gt;</code>, mendukung validasi otomatis melalui <code>DataAnnotations</code> seperti <code>[Required]</code> dan <code>[Range]</code>. Sangat cocok digunakan dalam <code>EditForm</code>.
+            </li>
+        </ul>
+
+        <div class="alert alert-info mt-4 mb-0">
+            <strong>Rekomendasi:</strong><br />
+            Gunakan <code>&lt;NumberInput&gt;</code> untuk input mandiri atau ringan.<br />
+            Gunakan <code>&lt;NumberInputBase&gt;</code> saat bekerja dengan <code>EditForm</code> dan validasi otomatis.
+        </div>
+    </div>
+</div>
+
+@code {
+    // Untuk <NumberInput> tanpa EditForm
+    private decimal? amountManual;
+
+    // Model untuk <NumberInputBase> dalam EditForm
+    private DemoModel model = new();
+
+    private void HandleValidSubmit()
+    {
+        Console.WriteLine($"Submitted Amount: {model.Amount}");
+    }
+
+    public class DemoModel
+    {
+        [Required(ErrorMessage = "Jumlah wajib diisi.")]
+        [Range(1000, 1000000, ErrorMessage = "Harus antara 1.000 – 1.000.000")]
+        public decimal? Amount { get; set; }
+    }
+}

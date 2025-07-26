@@ -1,0 +1,117 @@
+﻿<h2 class="mb-4 text-primary">📊 Perbandingan <code>&lt;NumberInput&gt;</code> vs <code>&lt;NumberInputBase&gt;</code></h2>
+
+<h4 class="text-secondary">🔍 Tabel 1: Perbandingan Fitur & Integrasi</h4>
+<div class="table-responsive mb-5">
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>🔧 Fitur / Aspek</th>
+                <th>🧱 <code>&lt;NumberInput&gt;</code><br /><small><code>&commat;bind-NumberValue</code></small></th>
+                <th>🧠 <code>&lt;NumberInputBase&gt;</code> (InputBase)<br /><small><code>&commat;bind-Value</code></small></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Binding Properti</strong></td>
+                <td><code>&commat;bind-NumberValue</code></td>
+                <td><code>&commat;bind-Value</code></td>
+            </tr>
+            <tr>
+                <td><strong>Nama Parameter</strong></td>
+                <td><code>NumberValue</code>, <code>NumberValueChanged</code></td>
+                <td><code>Value</code>, <code>ValueChanged</code> (otomatis)</td>
+            </tr>
+            <tr>
+                <td><strong>Validasi Otomatis</strong> (<code>EditForm</code>)</td>
+                <td>❌ Manual pakai <code>Required</code></td>
+                <td>✅ Terintegrasi penuh</td>
+            </tr>
+            <tr>
+                <td><strong><code>ValidationMessage</code></strong></td>
+                <td>Manual tampilkan jika diperlukan</td>
+                <td>✅ Otomatis pakai <code>&lt;ValidationMessage For="..." /&gt;</code></td>
+            </tr>
+            <tr>
+                <td><strong>EditContext & FieldIdentifier</strong></td>
+                <td>❌ Tidak terhubung</td>
+                <td>✅ Terhubung otomatis</td>
+            </tr>
+            <tr>
+                <td><strong>Debounce / Parsing Custom</strong></td>
+                <td>✅ Bebas diatur sendiri</td>
+                <td>✅ Bisa override <code>TryParseValueFromString</code></td>
+            </tr>
+            <tr>
+                <td><strong>Kontrol Tombol Arah (↑↓)</strong></td>
+                <td>✅ Ya</td>
+                <td>✅ Ya</td>
+            </tr>
+            <tr>
+                <td><strong>Kompatibilitas Blazor Standar</strong></td>
+                <td>⚠️ Perlu adaptasi manual</td>
+                <td>✅ Mirip <code>InputText</code>, <code>InputNumber</code></td>
+            </tr>
+            <tr>
+                <td><strong>Reusabilitas & Standarisasi</strong></td>
+                <td>Fleksibel, tapi kurang konsisten</td>
+                <td>✅ Sesuai pola Blazor resmi</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h4 class="text-secondary">🧮 Tabel 2: Kriteria Pemakaian & Tujuan</h4>
+<div class="table-responsive">
+    <table class="table table-bordered align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>📌 Kriteria</th>
+                <th><code>&lt;NumberInput&gt;</code> (Manual)</th>
+                <th><code>&lt;NumberInputBase&gt;</code> (Form Friendly)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>🧩 Binding</td>
+                <td><code>&commat;bind-NumberValue</code></td>
+                <td><code>&commat;bind-Value</code></td>
+            </tr>
+            <tr>
+                <td>✅ Dukungan <code>&lt;EditForm&gt;</code></td>
+                <td>Manual (harus menggunakan validasi sendiri)</td>
+                <td>Otomatis valid dengan <code>&lt;EditForm&gt;</code></td>
+            </tr>
+            <tr>
+                <td>📐 Validasi <code>[Required]</code>, <code>[Range]</code></td>
+                <td>Manual (menggunakan kondisi)</td>
+                <td>Built-in (otomatis dari <code>InputBase</code>)</td>
+            </tr>
+            <tr>
+                <td>⚙️ Kontrol tampilan & perilaku</td>
+                <td>Sangat fleksibel (bebas dikustomisasi)</td>
+                <td>Lebih terikat pada pipeline Blazor</td>
+            </tr>
+            <tr>
+                <td>🎯 Tujuan utama</td>
+                <td>Input angka mandiri, ringan</td>
+                <td>Form validasi terintegrasi</td>
+            </tr>
+            <tr>
+                <td>📦 Overhead logika internal</td>
+                <td>Lebih ringan</td>
+                <td>Lebih kompleks (turunan <code>InputBase</code>)</td>
+            </tr>
+            <tr>
+                <td>📘 Kemudahan untuk pemula</td>
+                <td>Mudah dan intuitif</td>
+                <td>Perlu memahami mekanisme Blazor Form</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="alert alert-info mt-4">
+    <strong>Rekomendasi:</strong><br />
+    Gunakan <code>&lt;NumberInput&gt;</code> jika ingin komponen ringan, fleksibel, dan bisa berdiri sendiri.<br />
+    Gunakan <code>&lt;NumberInputBase&gt;</code> jika digunakan dalam <code>&lt;EditForm&gt;</code> dan membutuhkan validasi otomatis seperti <code>InputText</code> bawaan Blazor.
+</div>
