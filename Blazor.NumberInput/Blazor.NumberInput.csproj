@@ -14,7 +14,7 @@
 		<PackageId>Blazor.NumberInput</PackageId>
 		<Version>1.0.0</Version>
 		<Authors>Gani Putras</Authors>
-		<Company>YourCompany</Company>
+		<Company>Ganiputras</Company>
 		<Product>Blazor.NumberInput</Product>
 		<Description>Reusable Blazor component for numeric input with formatting and validation.</Description>
 		<Copyright>Copyright © 2025</Copyright>
