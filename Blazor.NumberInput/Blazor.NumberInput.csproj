@@ -12,7 +12,7 @@
 		<!-- NuGet Metadata -->
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>Blazor.NumberInput</PackageId>
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 		<Authors>Gani Putras</Authors>
 		<Company>Ganiputras</Company>
 		<Product>Blazor.NumberInput</Product>
@@ -20,18 +20,34 @@
 		<Copyright>Copyright © 2025</Copyright>
 		<PackageTags>blazor;components;input;number;form;ui</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<RepositoryUrl>https://github.com/ganiputras/BlazorComponents</RepositoryUrl>
-		<PackageProjectUrl>https://github.com/ganiputras/BlazorComponents</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/ganiputras/Blazor.NumberInput</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/ganiputras/Blazor.NumberInput</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 
 		<PackageReleaseNotes>
 			<![CDATA[
-Versi 1.0.0 Blazor.NumberInput:
-- Komponen Input Angka dengan dukungan format dan validasi
-- Support CultureInfo, Placeholder, DecimalPlaces
+Blazor.NumberInput v1.0.1
+
+✅ Perubahan:
+- Penambahan dokumentasi XML dan komentar dalam kode untuk semua parameter komponen.
+- Penambahan validasi `Required` manual dengan pesan error kustom (dalam UI).
+- Dukungan validasi tombol input secara eksplisit (0–9 dan separator desimal lokal).
+- Penanganan tombol ↑ dan ↓ untuk menaikkan/menurunkan nilai sesuai step.
+- Pembersihan dan penyempurnaan event `oninput`, `onchange`, `onblur`, `onkeydown`, dan `onpaste`.
+- Perbaikan debounce input agar lebih stabil saat mengetik/paste.
+- Otomatis format ulang angka saat kehilangan fokus (`AutoFormatOnBlur = true`).
+- Penyempurnaan parameter `AdditionalAttributes`, `Prefix`, `Suffix`, dan `TextAlign`.
+
+📚 Dokumentasi:
+- Tersedia dokumentasi dan readme interaktif di GitHub:  
+  🔗 https://github.com/ganiputras/Blazor.NumberInput
+
+⚠️ Catatan:
+- Versi ini menggantikan versi 1.0.0 yang mengandung metadata NuGet (link repository) yang salah.
 ]]>
 		</PackageReleaseNotes>
+
 	</PropertyGroup>
 
 	<ItemGroup>
